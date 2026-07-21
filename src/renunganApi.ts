@@ -45,6 +45,16 @@ function toJsonHeaders() {
   };
 }
 
+async function buildApiError(response: Response, fallbackMessage: string) {
+  try {
+    const payload = (await response.json()) as { message?: string; error?: string };
+    const detail = [payload.message, payload.error].filter(Boolean).join(' | ');
+    return new Error(detail || fallbackMessage);
+  } catch {
+    return new Error(fallbackMessage);
+  }
+}
+
 export function slugifyRenungan(value: string) {
   return value
     .toLowerCase()
@@ -57,7 +67,7 @@ export function slugifyRenungan(value: string) {
 export async function fetchRenunganPosts(scope: 'public' | 'all' = 'public') {
   const response = await fetch(`/api/renungan?scope=${scope}`);
   if (!response.ok) {
-    throw new Error('Gagal memuat data renungan.');
+    throw await buildApiError(response, 'Gagal memuat data renungan.');
   }
 
   return (await response.json()) as RenunganPost[];
@@ -80,7 +90,7 @@ export async function saveRenunganPost(post: RenunganDraft) {
   });
 
   if (!response.ok) {
-    throw new Error('Gagal menyimpan renungan.');
+    throw await buildApiError(response, 'Gagal menyimpan renungan.');
   }
 
   return (await response.json()) as RenunganPost;
@@ -92,7 +102,7 @@ export async function deleteRenunganPost(id: number) {
   });
 
   if (!response.ok && response.status !== 204) {
-    throw new Error('Gagal menghapus renungan.');
+    throw await buildApiError(response, 'Gagal menghapus renungan.');
   }
 }
 
@@ -106,7 +116,7 @@ export async function uploadRenunganPdf(id: number, file: File) {
   });
 
   if (!response.ok) {
-    throw new Error('Gagal upload PDF renungan.');
+    throw await buildApiError(response, 'Gagal upload PDF renungan.');
   }
 
   return (await response.json()) as RenunganPost;

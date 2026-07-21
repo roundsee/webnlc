@@ -212,8 +212,9 @@ export function RenunganAdminPanel({ fallbackPosts, onStatusMessage }: Props) {
       const message = saved.status === 'published' ? 'Renungan dipublikasikan.' : 'Renungan disimpan sebagai draft.';
       setLocalMessage(message);
       onStatusMessage(message);
-    } catch {
-      const message = 'Gagal menyimpan renungan ke MySQL.';
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : 'Unknown error';
+      const message = `Gagal menyimpan renungan ke MySQL. ${detail}`;
       setLocalMessage(message);
       onStatusMessage(message);
     }

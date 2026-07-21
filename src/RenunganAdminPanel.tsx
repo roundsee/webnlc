@@ -270,7 +270,7 @@ export function RenunganAdminPanel({ fallbackPosts, onStatusMessage }: Props) {
   };
 
   const uploadPdf = async () => {
-    if (!selectedId || !pendingPdf) {
+    if (!pendingPdf) {
       const message = 'Pilih post renungan dan file PDF terlebih dulu.';
       setLocalMessage(message);
       onStatusMessage(message);
@@ -279,12 +279,21 @@ export function RenunganAdminPanel({ fallbackPosts, onStatusMessage }: Props) {
 
     try {
       setUploadingPdf(true);
-      const pendingMessage = 'Mengupload PDF...';
+      const targetId = selectedId ?? (await saveRenunganPost({
+        ...draft,
+        slug: draft.slug || slugifyRenungan(draft.title),
+        status: draft.status,
+        publishedAt: fromDateTimeLocal(toDateTimeLocal(draft.publishedAt)),
+      })).id;
+
+      setSelectedId(targetId);
+
+      const pendingMessage = selectedId ? 'Mengupload PDF...' : 'Menyimpan post lalu mengupload PDF...';
       setLocalMessage(pendingMessage);
       onStatusMessage(pendingMessage);
-      const saved = await uploadRenunganPdf(selectedId, pendingPdf);
+      const saved = await uploadRenunganPdf(targetId, pendingPdf);
       setPosts((current) => current.map((item) => (item.id === saved.id ? saved : item)));
-      if (selectedId === saved.id) {
+      if (targetId === saved.id) {
         setDraft(toDraftFromApi(saved));
       }
       setPendingPdf(null);

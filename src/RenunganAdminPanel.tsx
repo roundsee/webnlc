@@ -89,6 +89,7 @@ export function RenunganAdminPanel({ fallbackPosts, onStatusMessage }: Props) {
   const [searchTerm, setSearchTerm] = useState('');
   const [localMessage, setLocalMessage] = useState('');
   const [pendingPdf, setPendingPdf] = useState<File | null>(null);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -181,6 +182,7 @@ export function RenunganAdminPanel({ fallbackPosts, onStatusMessage }: Props) {
     setSelectedId(post.id);
     setDraft(toDraftFromApi(post));
     setPendingPdf(null);
+    setUploadingPdf(false);
     setLocalMessage(`Membuka "${post.title}".`);
   };
 
@@ -188,6 +190,7 @@ export function RenunganAdminPanel({ fallbackPosts, onStatusMessage }: Props) {
     setSelectedId(null);
     setDraft(emptyRenunganDraft);
     setPendingPdf(null);
+    setUploadingPdf(false);
     setLocalMessage('Renungan baru siap diisi.');
   };
 
@@ -275,6 +278,10 @@ export function RenunganAdminPanel({ fallbackPosts, onStatusMessage }: Props) {
     }
 
     try {
+      setUploadingPdf(true);
+      const pendingMessage = 'Mengupload PDF...';
+      setLocalMessage(pendingMessage);
+      onStatusMessage(pendingMessage);
       const saved = await uploadRenunganPdf(selectedId, pendingPdf);
       setPosts((current) => current.map((item) => (item.id === saved.id ? saved : item)));
       if (selectedId === saved.id) {
@@ -289,6 +296,8 @@ export function RenunganAdminPanel({ fallbackPosts, onStatusMessage }: Props) {
       const message = detail ? `Gagal upload PDF renungan. ${detail}` : 'Gagal upload PDF renungan.';
       setLocalMessage(message);
       onStatusMessage(message);
+    } finally {
+      setUploadingPdf(false);
     }
   };
 
@@ -413,8 +422,8 @@ export function RenunganAdminPanel({ fallbackPosts, onStatusMessage }: Props) {
               />
             </label>
             <div className="pdf-upload-actions">
-              <button className="mini-button" type="button" onClick={uploadPdf}>
-                Upload PDF
+              <button className="mini-button" type="button" onClick={uploadPdf} disabled={uploadingPdf}>
+                {uploadingPdf ? 'Mengupload...' : 'Upload PDF'}
               </button>
               {pendingPdf ? <span>{pendingPdf.name}</span> : <span>Belum ada file dipilih.</span>}
             </div>

@@ -413,7 +413,7 @@ export function RenunganAdminPanel({ fallbackPosts, onStatusMessage }: Props) {
               />
             </label>
             <div className="pdf-upload-actions">
-              <button className="mini-button" type="button" onClick={uploadPdf} disabled={!selectedId || !pendingPdf}>
+              <button className="mini-button" type="button" onClick={uploadPdf}>
                 Upload PDF
               </button>
               {pendingPdf ? <span>{pendingPdf.name}</span> : <span>Belum ada file dipilih.</span>}

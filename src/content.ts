@@ -70,6 +70,17 @@ export type Content = {
   events: Event[];
   sermons: Sermon[];
   posts: Post[];
+  quiz: {
+    title: string;
+    question: string;
+    options: string[];
+    answer: string;
+    note: string;
+  };
+  humor: {
+    title: string;
+    items: string[];
+  };
   locations: {
     region: string;
     name: string;
@@ -105,7 +116,7 @@ export const defaultContent: Content = {
   navigation: {
     home: 'Beranda',
     about: 'Tentang',
-    ministry: 'Pelayanan',
+    ministry: 'Life Group',
     blog: 'Blog',
     media: 'Media',
     contact: 'Kontak',
@@ -124,7 +135,7 @@ export const defaultContent: Content = {
   },
   highlights: [
     { label: 'Ibadah Minggu', value: '3 Sesi', note: 'Pagi, siang, dan malam' },
-    { label: 'Komunitas Aktif', value: '12+ Group', note: 'Pemuda, keluarga, dan pelayanan' },
+    { label: 'Komunitas Aktif', value: '12 Life Group', note: 'LG Kopi, LG Hana, LG Wings, dll' },
     { label: 'Konten Digital', value: 'Setiap Minggu', note: 'Sermon, highlight, dan pengumuman' },
   ],
   about: {
@@ -139,22 +150,74 @@ export const defaultContent: Content = {
   },
   ministries: [
     {
-      name: 'Youth & Young Adult',
-      description: 'Komunitas generasi muda dengan pertemuan rutin, worship night, dan mentoring.',
+      name: 'LG Kopi',
+      description: 'Komunitas Pria Integritas.',
       meeting: 'Jumat, 19.00 WIB',
     },
     {
-      name: 'Family & Marriage',
-      description: 'Ruang pertumbuhan untuk keluarga, pasangan, dan parenting.',
+      name: 'LG Hana',
+      description: 'Komunitas wanita yang bertumbuh dalam firman dan persekutuan.',
       meeting: 'Sabtu, 10.00 WIB',
     },
     {
-      name: 'Worship Team',
-      description: 'Pelayanan musik, vokal, dan produksi media untuk mendukung ibadah.',
+      name: 'LG Wings',
+      description: 'Komunitas muda yang dinamis untuk bertumbuh, melayani, dan berdampak.',
       meeting: 'Rabu, 18.30 WIB',
+    },
+    {
+      name: 'LG Grace',
+      description: 'Komunitas keluarga untuk saling menguatkan dan mendoakan.',
+      meeting: 'Kamis, 19.00 WIB',
+    },
+    {
+      name: 'LG Hope',
+      description: 'Komunitas dengan fokus pemuridan dan pertumbuhan rohani.',
+      meeting: 'Selasa, 19.00 WIB',
+    },
+    {
+      name: 'LG Joy',
+      description: 'Komunitas yang menolong jemaat bertumbuh dalam sukacita Kristus.',
+      meeting: 'Sabtu, 16.00 WIB',
+    },
+    {
+      name: 'LG Faith',
+      description: 'Komunitas untuk memperkuat iman melalui sharing firman dan doa.',
+      meeting: 'Jumat, 18.30 WIB',
+    },
+    {
+      name: 'LG Shine',
+      description: 'Komunitas yang fokus pada pelayanan, kesaksian, dan dampak sosial.',
+      meeting: 'Minggu, 15.00 WIB',
+    },
+    {
+      name: 'LG One',
+      description: 'Komunitas yang menjaga kebersamaan dan kesatuan tubuh Kristus.',
+      meeting: 'Rabu, 19.30 WIB',
+    },
+    {
+      name: 'LG Connect',
+      description: 'Komunitas untuk relasi, mentoring, dan penguatan iman.',
+      meeting: 'Senin, 19.00 WIB',
+    },
+    {
+      name: 'LG Harvest',
+      description: 'Komunitas yang bertumbuh dalam pelayanan dan pengutusan.',
+      meeting: 'Kamis, 18.30 WIB',
+    },
+    {
+      name: 'LG Next',
+      description: 'Komunitas generasi berikutnya untuk pembinaan dan aktivasi talenta.',
+      meeting: 'Sabtu, 19.00 WIB',
     },
   ],
   events: [
+    {
+      date: '10-12 September 2026',
+      title: 'National Mission Conference - Behold and Listen',
+      time: 'Sepanjang hari',
+      location: 'GSJA New Life Bandung',
+      description: 'Conference nasional GSJA dengan tema Behold and Listen. Siapkan jemaat untuk mengikuti sesi pembicara, worship, dan persekutuan.',
+    },
     {
       date: 'Minggu, 28 Juli',
       title: 'Ibadah Raya & Perjamuan',
@@ -186,6 +249,21 @@ export const defaultContent: Content = {
       videoLabel: 'Media Placeholder',
     },
   ],
+  quiz: {
+    title: 'Quiz Firman Minggu Ini',
+    question: 'Siapakah yang berjalan di atas air bersama Yesus?',
+    options: ['Petrus', 'Yohanes', 'Yakobus', 'Andreas'],
+    answer: 'Petrus',
+    note: 'Jawaban ditampilkan sebagai ilustrasi. Bisa diganti menjadi quiz interaktif nanti.',
+  },
+  humor: {
+    title: 'Humor Kristen',
+    items: [
+      'Kalau doa belum dijawab, mungkin Tuhan lagi siapkan update versi berikutnya.',
+      'Jangan lupa: iman tanpa tindakan itu seperti Wi-Fi tanpa sinyal.',
+      'Minggu pagi: minat tidur besar, tapi roh tetap panggil ibadah.',
+    ],
+  },
   posts: [
     {
       type: 'Renungan',
@@ -222,19 +300,19 @@ export const defaultContent: Content = {
     },
   ],
   locations: [
-    { region: 'Indonesia', name: 'GSJA New Life Surabaya', address: 'Pakuwon Mall Surabaya, Rooftop 2' },
-    { region: 'Indonesia', name: 'GSJA New Life Jakarta', address: 'Main Hall, pusat kota Jakarta' },
-    { region: 'Asia', name: 'GSJA New Life Singapore', address: 'Community Hall, Central District' },
+    { region: 'Cabang', name: 'Taman Kopo Ketapang', address: 'Bandung' },
+    { region: 'Indonesia', name: 'GSJA New Life Bandung', address: 'Jl. Merdeka No. 32, Bandung' },
+    { region: 'Indonesia', name: 'GSJA New Life Online', address: 'Platform digital dan komunitas jemaat' },
   ],
   founder: {
     label: 'Gembala Sidang',
-    name: 'Ps. Jonathan Rivera',
+    name: 'Ps. Yoel Soekardi, M.Div',
     bio: 'Bio placeholder untuk profil gembala/pemimpin gereja. Ganti dengan informasi resmi dari Anda.',
   },
   contact: {
     title: 'Hubungi Kami',
     description: 'Ganti data kontak, alamat, dan tombol call-to-action sesuai kebutuhan gereja Anda.',
-    address: 'Jl. Contoh No. 123, Jakarta',
+    address: 'Jl. Merdeka No. 32, Bandung',
     phone: '+62 812 3456 7890',
     email: 'hello@nlc.church',
     cta: 'Kirim Pesan',

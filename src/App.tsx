@@ -9,6 +9,7 @@ const POSTS_PER_PAGE = 3;
 const PREVIEW_TOKEN = 'dev010101010';
 const PREVIEW_PREFIX = `/${PREVIEW_TOKEN}`;
 const LIVE_DOMAIN_URL = 'https://gsjanewlifebdg.com';
+const TERHUBUNG_APP_URL = 'https://play.google.com/store/apps/details?id=com.terhubung.app';
 const PRODUCTION_HOSTS = new Set(['gsjanewlifebdg.com', 'www.gsjanewlifebdg.com']);
 
 type LegacyNavigation = Partial<Content['navigation']> & { renungan?: string };
@@ -109,6 +110,10 @@ function loadContent(): Content {
     }
 
     const parsed = JSON.parse(stored) as Content;
+    const oldFounderNames = new Set(['Ps. Jonathan Rivera']);
+    const oldAddresses = new Set(['Jl. Contoh No. 123, Jakarta']);
+    const oldLocations = new Set(['GSJA New Life Surabaya', 'GSJA New Life Jakarta', 'GSJA New Life Singapore']);
+
     return {
       ...defaultContent,
       ...parsed,
@@ -117,8 +122,16 @@ function loadContent(): Content {
       hero: { ...defaultContent.hero, ...parsed.hero },
       navigation: mergeNavigation(parsed.navigation as LegacyNavigation),
       about: { ...defaultContent.about, ...parsed.about },
-      contact: { ...defaultContent.contact, ...parsed.contact },
-      founder: { ...defaultContent.founder, ...parsed.founder },
+      contact: {
+        ...defaultContent.contact,
+        ...parsed.contact,
+        address: !parsed.contact?.address || oldAddresses.has(parsed.contact.address) ? defaultContent.contact.address : parsed.contact.address,
+      },
+      founder: {
+        ...defaultContent.founder,
+        ...parsed.founder,
+        name: !parsed.founder?.name || oldFounderNames.has(parsed.founder.name) ? defaultContent.founder.name : parsed.founder.name,
+      },
       footer: {
         ...defaultContent.footer,
         ...parsed.footer,
@@ -129,7 +142,10 @@ function loadContent(): Content {
       events: parsed.events?.length ? parsed.events : defaultContent.events,
       sermons: parsed.sermons?.length ? parsed.sermons : defaultContent.sermons,
       posts: parsed.posts?.length ? parsed.posts.map(normalizePost) : defaultContent.posts,
-      locations: parsed.locations?.length ? parsed.locations : defaultContent.locations,
+      locations:
+        parsed.locations?.length && !parsed.locations.every((location) => oldLocations.has(location.name))
+          ? parsed.locations
+          : defaultContent.locations,
     };
   } catch {
     return defaultContent;
@@ -268,37 +284,6 @@ function HomePage({ content, onNavigate }: { content: Content; onNavigate: (path
               <a className="button primary" href="#events">
                 {content.hero.primaryCta}
               </a>
-              <button className="button secondary" onClick={() => onNavigate('/admin')} type="button">
-                {content.hero.secondaryCta}
-              </button>
-            </div>
-            <div className="hero-quote-card">
-              <span className="section-label">This Week</span>
-              <strong>{content.mission}</strong>
-              <p>Gunakan area ini sebagai headline besar yang selalu berubah sesuai momentum pelayanan.</p>
-            </div>
-            <div className="service-strip">
-              <div className="service-chip">
-                <span>Sunday Service</span>
-                <strong>08.00 / 10.30 / 17.00</strong>
-              </div>
-              <div className="service-chip">
-                <span>Live Worship</span>
-                <strong>Band + Choir + Media</strong>
-              </div>
-              <div className="service-chip">
-                <span>Prayer Room</span>
-                <strong>Open every week</strong>
-              </div>
-            </div>
-            <div className="highlights-grid">
-              {content.highlights.map((item) => (
-                <article className="highlight-card" key={item.label}>
-                  <span>{item.label}</span>
-                  <strong>{item.value}</strong>
-                  <small>{item.note}</small>
-                </article>
-              ))}
             </div>
           </div>
 
@@ -317,6 +302,37 @@ function HomePage({ content, onNavigate }: { content: Content; onNavigate: (path
                 <strong>Watch Sunday sermon highlight</strong>
               </div>
             </div>
+          </div>
+        </section>
+
+        <section className="section hero-extras">
+          <div className="hero-quote-card">
+            <span className="section-label">This Week</span>
+            <strong>{content.mission}</strong>
+            <p>Gunakan area ini sebagai headline besar yang selalu berubah sesuai momentum pelayanan.</p>
+          </div>
+          <div className="service-strip">
+            <div className="service-chip">
+              <span>Sunday Service</span>
+              <strong>08.00 / 10.30 / 17.00</strong>
+            </div>
+            <div className="service-chip">
+              <span>Live Worship</span>
+              <strong>Band + Choir + Media</strong>
+            </div>
+            <div className="service-chip">
+              <span>Prayer Room</span>
+              <strong>Open every week</strong>
+            </div>
+          </div>
+          <div className="highlights-grid">
+            {content.highlights.map((item) => (
+              <article className="highlight-card" key={item.label}>
+                <span>{item.label}</span>
+                <strong>{item.value}</strong>
+                <small>{item.note}</small>
+              </article>
+            ))}
           </div>
         </section>
 
@@ -455,6 +471,37 @@ function HomePage({ content, onNavigate }: { content: Content; onNavigate: (path
           </div>
         </section>
 
+        <section className="section split" id="fun-corner">
+          <div className="quiz-card">
+            <span className="section-label">Fun Corner</span>
+            <h2>{content.quiz.title}</h2>
+            <p>{content.quiz.question}</p>
+            <div className="quiz-options">
+              {content.quiz.options.map((option) => (
+                <div className="quiz-option" key={option}>
+                  {option}
+                </div>
+              ))}
+            </div>
+            <p className="quiz-answer">
+              Jawaban: <strong>{content.quiz.answer}</strong>
+            </p>
+            <small>{content.quiz.note}</small>
+          </div>
+
+          <div className="humor-card">
+            <span className="section-label">Fun Corner</span>
+            <h2>{content.humor.title}</h2>
+            <div className="humor-list">
+              {content.humor.items.map((item) => (
+                <article className="humor-item" key={item}>
+                  <p>{item}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section className="section contact-section" id="contact">
           <div>
             <span className="section-label">Contact</span>
@@ -474,6 +521,9 @@ function HomePage({ content, onNavigate }: { content: Content; onNavigate: (path
               <span>Email</span>
               <strong>{content.contact.email}</strong>
             </div>
+            <a className="button secondary full" href={TERHUBUNG_APP_URL} target="_blank" rel="noreferrer">
+              Buka Aplikasi Terhubung
+            </a>
             <button className="button primary full" type="button">
               {content.contact.cta}
             </button>

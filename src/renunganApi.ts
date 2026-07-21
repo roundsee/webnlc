@@ -46,12 +46,29 @@ function toJsonHeaders() {
 }
 
 async function buildApiError(response: Response, fallbackMessage: string) {
+  const statusLabel = `${response.status} ${response.statusText}`.trim();
+
   try {
-    const payload = (await response.json()) as { message?: string; error?: string };
-    const detail = [payload.message, payload.error].filter(Boolean).join(' | ');
-    return new Error(detail || fallbackMessage);
+    const rawBody = await response.text();
+
+    if (rawBody) {
+      try {
+        const payload = JSON.parse(rawBody) as { message?: string; error?: string };
+        const detail = [payload.message, payload.error].filter(Boolean).join(' | ');
+        if (detail) {
+          return new Error(`${detail} (HTTP ${statusLabel})`);
+        }
+      } catch {
+        const compactBody = rawBody.replace(/\s+/g, ' ').trim().slice(0, 260);
+        if (compactBody) {
+          return new Error(`${fallbackMessage} (HTTP ${statusLabel}) Response: ${compactBody}`);
+        }
+      }
+    }
+
+    return new Error(`${fallbackMessage} (HTTP ${statusLabel})`);
   } catch {
-    return new Error(fallbackMessage);
+    return new Error(`${fallbackMessage} (HTTP ${statusLabel})`);
   }
 }
 

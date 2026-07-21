@@ -284,8 +284,9 @@ export function RenunganAdminPanel({ fallbackPosts, onStatusMessage }: Props) {
       const message = 'PDF renungan berhasil diupload.';
       setLocalMessage(message);
       onStatusMessage(message);
-    } catch {
-      const message = 'Gagal upload PDF renungan.';
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : '';
+      const message = detail ? `Gagal upload PDF renungan. ${detail}` : 'Gagal upload PDF renungan.';
       setLocalMessage(message);
       onStatusMessage(message);
     }

@@ -80,6 +80,15 @@ function stripHtml(value: string) {
   return value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
+function getPdfViewerUrl(url: string) {
+  if (!url) {
+    return '';
+  }
+
+  const fragment = 'toolbar=0&navpanes=0&scrollbar=1&view=FitH';
+  return url.includes('#') ? `${url}&${fragment}` : `${url}#${fragment}`;
+}
+
 export function RenunganAdminPanel({ fallbackPosts, onStatusMessage }: Props) {
   const [posts, setPosts] = useState<RenunganPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -417,7 +426,7 @@ export function RenunganAdminPanel({ fallbackPosts, onStatusMessage }: Props) {
             <div className="group-header">
               <h3>Lampiran PDF</h3>
               {draft.pdfUrl ? (
-                <a className="mini-button" href={draft.pdfUrl} target="_blank" rel="noreferrer">
+                <a className="mini-button" href={getPdfViewerUrl(draft.pdfUrl)} target="_blank" rel="noreferrer">
                   Preview PDF
                 </a>
               ) : null}

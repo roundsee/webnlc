@@ -53,6 +53,15 @@ function formatDate(value: string) {
   }
 }
 
+function getPdfViewerUrl(url: string) {
+  if (!url) {
+    return '';
+  }
+
+  const fragment = 'toolbar=0&navpanes=0&scrollbar=1&view=FitH';
+  return url.includes('#') ? `${url}&${fragment}` : `${url}#${fragment}`;
+}
+
 function mergeNavigation(overrides?: LegacyNavigation) {
   return {
     ...defaultContent.navigation,
@@ -728,7 +737,7 @@ function BlogPage({ content, onNavigate, buildPath }: { content: Content; onNavi
                       <span>{selectedPost.pdfOriginalName || 'Dokumen Renungan'}</span>
                       <span>{selectedPost.pdfSizeBytes ? `${Math.max(1, Math.round(selectedPost.pdfSizeBytes / 1024))} KB` : ''}</span>
                     </div>
-                    <iframe title={`PDF ${selectedPost.title}`} src={selectedPost.pdfUrl} className="pdf-iframe" />
+                    <iframe title={`PDF ${selectedPost.title}`} src={getPdfViewerUrl(selectedPost.pdfUrl)} className="pdf-iframe" />
                   </div>
                 ) : null}
               </article>

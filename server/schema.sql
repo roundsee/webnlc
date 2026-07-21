@@ -1,0 +1,20 @@
+CREATE DATABASE IF NOT EXISTS db_nlc CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE db_nlc;
+
+CREATE TABLE IF NOT EXISTS renungan_posts (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  slug VARCHAR(160) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  excerpt TEXT NOT NULL,
+  html_content LONGTEXT NOT NULL,
+  status ENUM('draft', 'published') NOT NULL DEFAULT 'draft',
+  published_at DATETIME NULL,
+  pdf_path VARCHAR(500) NULL,
+  pdf_original_name VARCHAR(255) NULL,
+  pdf_size_bytes BIGINT NULL,
+  pdf_mime_type VARCHAR(120) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY unique_slug (slug)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

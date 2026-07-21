@@ -4,13 +4,17 @@ import mysql from 'mysql2/promise';
 import multer from 'multer';
 import { existsSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const port = Number(process.env.PORT || 3001);
 const mysqlHost = process.env.DB_HOST || 'localhost';
 const mysqlPort = Number(process.env.DB_PORT || 3306);
-const mysqlUser = process.env.DB_USER || 'root';
+const mysqlUser = process.env.DB_USER || process.env.DB_USERNAME || 'root';
 const mysqlPassword = process.env.DB_PASSWORD || 'test';
-const databaseName = process.env.DB_NAME || 'db_nlc';
+const databaseName = process.env.DB_NAME || process.env.DB_DATABASE || 'db_nlc';
+const serverDir = path.dirname(fileURLToPath(import.meta.url));
+const appRoot = process.env.APP_ROOT ? path.resolve(process.env.APP_ROOT) : path.resolve(serverDir, '..');
+const uploadsBasePath = process.env.UPLOADS_DIR ? path.resolve(process.env.UPLOADS_DIR) : path.join(appRoot, 'uploads');
 
 const schemaSql = `
 CREATE TABLE IF NOT EXISTS renungan_posts (
@@ -32,7 +36,7 @@ CREATE TABLE IF NOT EXISTS renungan_posts (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 `;
 
-const uploadsPath = path.resolve(process.cwd(), 'uploads', 'renungan');
+const uploadsPath = path.join(uploadsBasePath, 'renungan');
 mkdirSync(uploadsPath, { recursive: true });
 
 const upload = multer({
@@ -302,9 +306,29 @@ app.post('/api/renungan/:id/pdf', upload.single('pdf'), async (req, res) => {
   }
 });
 
-const distPath = path.resolve(process.cwd(), 'dist');
+// Handle known upload errors with clear messages for clients/admin panel.
+app.use((error, _req, res, next) => {
+  if (error instanceof multer.MulterError) {
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      res.status(413).json({ message: 'Ukuran file PDF maksimal 20MB.' });
+      return;
+    }
 
-app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));
+    res.status(400).json({ message: 'Upload gagal.', error: error.message });
+    return;
+  }
+
+  if (error instanceof Error && error.message === 'Hanya file PDF yang diperbolehkan.') {
+    res.status(400).json({ message: error.message });
+    return;
+  }
+
+  next(error);
+});
+
+const distPath = path.join(appRoot, 'dist');
+
+app.use('/uploads', express.static(uploadsBasePath));
 
 if (existsSync(distPath)) {
   app.use(express.static(distPath));
@@ -316,6 +340,8 @@ if (existsSync(distPath)) {
 bootstrapDatabase()
   .then(() => {
     app.listen(port, () => {
+      console.log(`App root: ${appRoot}`);
+      console.log(`Uploads path: ${uploadsPath}`);
       console.log(`Renungan API listening on http://localhost:${port}`);
     });
   })
